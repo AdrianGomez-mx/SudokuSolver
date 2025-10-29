@@ -7,9 +7,10 @@ import pyautogui
 from SudokuSolver import SudokuSolver
 
 def main():
-    # Make sure alt-tabbing switches to the browser where sudoku.com is open
+    # Se realiza un intercambio de pantalla para tomar el screenshot, hay que asegurarse que el sudoku este en la otra página
     pyautogui.hotkey("alt", "tab", interval=0.1)
-    # Take a screenshot of the screen and find the sudoku
+
+    # Toma una screenshot del sudoku
     screenshot = pyautogui.screenshot()
     screenshot = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
     preprocessed = preprocess(screenshot)
@@ -18,15 +19,17 @@ def main():
         print("No sudoku found")
         return
     cropped_grid = crop_grid(screenshot, square_contour)
-    # Split the sudoku into 81 squares and detect the digits
+
+    # Divide la imagen en cuadros individuales para cada número y lo guarda en sudoku
     squares_images = split_grid(cropped_grid)
     sudoku = squares_images_to_sudoku(squares_images)
-    # Solve the sudoku
+
+    # Se invoca a la función principal del archivo SudokuSolver
     solver = SudokuSolver(sudoku)
     solved = solver.solve()
     solve_on_website(square_contour, solved)
 
-# -- Image preprocessing
+# -- Procesado de imagen
 def preprocess(screenshot):
     gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -69,7 +72,7 @@ def split_grid(cropped_grid):
             squares.append(square_img)
     return squares
 
-# -- Machine learning model
+# -- Machine learning mediante el archivo dataset.csv
 def squares_images_to_sudoku(squares_images):
     knn = create_knn_model()
     sudoku = np.zeros((81), dtype=int)
@@ -90,7 +93,7 @@ def create_knn_model():
     knn.fit(X, y)
     return knn
 
-# -- Sending the solution to the website
+# -- Realiza la solución en el sitio
 def solve_on_website(square_contour, solved):
     x, y, w, h = cv2.boundingRect(square_contour)
     square_size = h // 9

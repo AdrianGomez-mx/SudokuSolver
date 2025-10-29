@@ -2,20 +2,22 @@ import numpy as np
 import time
 
 class SudokuSolver:
-
+    # El sudoku inicia aquí
     def __init__(self, sudoku):
-        self.bitmap = np.ones((9, 9, 9), dtype=bool)
-        self.sudoku = np.zeros((9, 9), dtype=int)
+        self.bitmap = np.ones((9, 9, 9), dtype=bool) # Variable para las posibilidades sin probar
+        self.sudoku = np.zeros((9, 9), dtype=int) # Variable para el sudoku real
         for i in range(9):
             for j in range(9):
                 if sudoku[i][j] != 0:
-                    self.place_number(i, j, sudoku[i][j])
+                    self.place_number(i, j, sudoku[i][j]) # Recorre la matriz buscando algo que no sea un cero para remplazarlo por el número
 
+    # La ejecución inicia aquí
     def solve(self):
         start = time.time()
-        self.backtrack()
+        self.backtrack() # Invoca el backtracking
         end = time.time()
         self.solve_time = end - start
+        print(self.solve_time)
         return self.sudoku
     
     def backtrack(self):
@@ -37,7 +39,7 @@ class SudokuSolver:
     def is_solved(self):
         return np.sum(self.sudoku == 0) == 0
     
-    def least_options_cell(self):
+    def least_options_cell(self): # Función de optimización
         cell_sums = np.sum(self.bitmap, axis=2)
         cell_sums[cell_sums == 0] = 10
         min_sum_indices = np.unravel_index(np.argmin(cell_sums), cell_sums.shape)
